@@ -1,7 +1,7 @@
 Autorização
 =========
 
-Autorização é o processo que verifica se um usuário tem permissão para fazer alguma coisa. O Yii fornece dois métodos de autorização: Filtro de Controle de Acesso (ACF) e Controle de Acesso Baseado em Role (RBAC).
+Autorização é o processo que verifica se um usuário tem permissão para fazer alguma coisa. O Yii fornece dois métodos de autorização: Filtro de Controle de Acesso (ACF) e Controle de Acesso Baseado em Função (RBAC).
 
 
 ## Filtro de Controle de Acesso <span id="access-control-filter"></span>
@@ -75,12 +75,12 @@ As [[yii\filters\AccessRule|regras de acesso]] suporta muitas opções. A seguir
 
 * [[yii\filters\AccessRule::controllers|controllers]]: especifica que controllers (controlador) esta regra corresponde. Deve ser um array de IDs de controller. A comparação é case-sensitive. Se esta opção estiver vazia ou não definida, isso significa que a regra se aplica a todos controllers.
 
-* [[yii\filters\AccessRule::roles|roles]]: especifica quais roles de usuários que esta regra corresponde. Dois caracteres especiais são reconhecidos, e eles são verificados através [[yii\web\User::isGuest]]:
+* [[yii\filters\AccessRule::roles|roles]]: especifica quais funções de usuários que esta regra corresponde. Dois caracteres especiais são reconhecidos, e eles são verificados através [[yii\web\User::isGuest]]:
 
     - `?`: corresponde a um usuário convidado (ainda não autenticado)
     - `@`: corresponde a um usuário autenticado
 
-  A utilização de outros nomes invocará o método [[yii\web\User::can()]], que requer RBAC permitindo (a ser descrito na próxima subsecção). Se esta opção estiver vazia ou não definida, significa que esta regra se aplica a todas as roles.
+  A utilização de outros nomes invocará o método [[yii\web\User::can()]], que requer RBAC permitindo (a ser descrito na próxima subsecção). Se esta opção estiver vazia ou não definida, significa que esta regra se aplica a todas as funções.
 
 * [[yii\filters\AccessRule::ips|ips]]: especifica quais  [[yii\web\Request::userIP|client IP addresses]] esta regra corresponde. Um endereço de ip pode conter o coringa `*` no final para que ele corresponda endereços IP com o mesmo prefixo.
 Por exemplo, '192.168.*' corresponde a todos os endereços IPs no seguimento '192.168.'. Se esta opção estiver vazia ou não definida, significa que esta regra se aplica a todos os endereços IPs.
@@ -127,9 +127,9 @@ class SiteController extends Controller
 ```
 
 
-## Controle de Acesso Baseado em Role (RBAC) <span id="rbac"></span>
+## Controle de Acesso Baseado em Função (RBAC) <span id="rbac"></span>
 
-Controle de Acesso Baseado em Role (RBAC) fornece um simples porém poderoso controle de acesso centralizado. Por favor, consulte [Wikipedia](http://en.wikipedia.org/wiki/Role-based_access_control) para obter detalhes sobre comparação de RBAC com outros sistemas de controle de acesso mais tradicionais.
+Controle de Acesso Baseado em Função (RBAC) fornece um simples porém poderoso controle de acesso centralizado. Por favor, consulte [Wikipedia](http://en.wikipedia.org/wiki/Role-based_access_control) para obter detalhes sobre comparação de RBAC com outros sistemas de controle de acesso mais tradicionais.
 
 Yii implementa um RBAC Hierárquico genérico, conforme [NIST RBAC model](http://csrc.nist.gov/rbac/sandhu-ferraiolo-kuhn-00.pdf). Ele fornece as funcionalidades RBAC através do [componente de aplicação](structure-application-components.md) [[yii\rbac\ManagerInterface|authManager]].
 
@@ -140,18 +140,18 @@ Para facilitar a próxima descrição, vamos primeiro introduzir alguns conceito
 
 ### Conceitos Básicos <span id="basic-concepts"></span>
 
-Uma role representa uma coleção de *permissões* (ex. criar posts, atualizar posts). Uma role pode ser atribuído a um ou vários usuários. Para verificar se um usuário tem uma permissão especifica, podemos verificar se o usuário está associado a uma role que contém esta permissão.
+Uma *função* representa uma coleção de *permissões* (ex. criar posts, atualizar posts). Uma função pode ser atribuída a um ou vários usuários. Para verificar se um usuário tem uma permissão especifica, podemos verificar se o usuário está associado a uma função que contém esta permissão.
 
-Associado com cada role ou permissão, pode haver uma *regra*. Uma regra representa uma parte do código que será executado durante verificação de acesso para determinar se a role ou permissão correspondentes se aplicam ao usuário corrente.
+Associado com cada função ou permissão, pode haver uma *regra*. Uma regra representa uma parte do código que será executado durante verificação de acesso para determinar se a função ou permissão correspondentes se aplicam ao usuário corrente.
 Por exemplo, a permissão para "atualizar post" pode ter uma regra que verifica se  o usuário corrente é quem criou o post.
 Durante a verificação de acesso, se o usuário NÃO for quem criou o post, ele não terá permissão para "atualizar o post".
 
-Ambos roles e permissões podem ser organizadas numa hierarquia. Em particular, uma role pode constituída de outras roles ou permissões; e uma permissão pode consistir em outras permissões. Yii implementa uma hierarquia de *ordem parcial* que inclui a hierarquia de *árvore* mais especial. Enquanto uma role pode conter uma permissão, o inverso não é verdadeiro.
+Ambos funções e permissões podem ser organizados numa hierarquia. Em particular, uma função pode ser constituída de outras funções ou permissões; e uma permissão pode consistir em outras permissões. Yii implementa uma hierarquia de *ordem parcial* que inclui a hierarquia de *árvore* mais especial. Enquanto uma função pode conter uma permissão, o inverso não é verdadeiro.
 
 
 ### Configurando RBAC <span id="configuring-rbac"></span>
 
-Antes de partimos para definir dados de autorização e realizar a verificação de acesso, precisamos configurar o componente de aplicação [[yii\base\Application::authManager|authManager]]. Yii oferece dois tipos de gerenciadores de autorização: [[yii\rbac\PhpManager]] e [[yii\rbac\DbManager]]. O primeiro utiliza um script PHP para armazena os dados de autorização, enquanto o último armazena os dados de autorização no banco. Você pode considerar o uso do primeiro se a sua aplicação não requerer um gerenciamento  muito dinâmico das role e permissões.
+Antes de partimos para definir dados de autorização e realizar a verificação de acesso, precisamos configurar o componente de aplicação [[yii\base\Application::authManager|authManager]]. Yii oferece dois tipos de gerenciadores de autorização: [[yii\rbac\PhpManager]] e [[yii\rbac\DbManager]]. O primeiro utiliza um script PHP para armazena os dados de autorização, enquanto o último armazena os dados de autorização no banco. Você pode considerar o uso do primeiro se a sua aplicação não requerer um gerenciamento  muito dinâmico das funções e permissões.
 
 
 #### Usando`PhpManager` <span id="using-php-manager"></span>
@@ -207,11 +207,11 @@ O `authManager` já pode ser acessado via `\Yii::$app->authManager`.
 
 Para construir dados de autorização devem ser realizadas as seguintes tarefas:
 
-- definir roles e permissões;
-- estabelecer relações entre roles e permissões;
+- definir funções e permissões;
+- estabelecer relações entre funções e permissões;
 - definir regras;
-- associar regras com roles e permissões;
-- atribuir roles a usuários.
+- associar regras com funções e permissões;
+- atribuir funções a usuários.
 
 
 Dependendo dos requisitos de flexibilidade de autorização das tarefas acima poderia ser feito de maneiras diferentes.
@@ -241,19 +241,19 @@ class RbacController extends Controller
        $updatePost->description = 'Update post';
        $auth->add($updatePost);
 
-       // adciona a role "author" e da a esta role a permissão "createPost"
+       // adciona a função "author" e da a esta função a permissão "createPost"
        $author = $auth->createRole('author');
        $auth->add($author);
        $auth->addChild($author, $createPost);
 
-       // adciona a role "admin" e da a esta role a permissão "updatePost"
-       // bem como as permissões da role "author"
+       // adciona a função "admin" e da a esta função a permissão "updatePost"
+       // bem como as permissões da função "author"
        $admin = $auth->createRole('admin');
        $auth->add($admin);
        $auth->addChild($admin, $updatePost);
        $auth->addChild($admin, $author);
 
-       // Atribui roles para usuários. 1 and 2 são IDs retornados por IdentityInterface::getId()
+       // Atribui funções para usuários. 1 and 2 são IDs retornados por IdentityInterface::getId()
        // normalmente implementado no seu model User.
        $auth->assign($author, 2);
        $auth->assign($admin, 1);
@@ -267,7 +267,7 @@ Depois de executar o comando com `yii rbac/init` nós vamos chegar a seguinte hi
 
 Author pode criar post, admin pode atualizar post e fazer tudo que author pode.
 
-Se a sua aplicação permite inscrição de usuários, você precisa atribuir roles a esses novos usuários. Por exemplo, para que todos os usuários inscritos tornem-se authors, no seu template avançado de projeto você precisa modificar o `frontend\models\SignupForm::signup()`
+Se a sua aplicação permite inscrição de usuários, você precisa atribuir funções a esses novos usuários. Por exemplo, para que todos os usuários inscritos tornem-se authors, no seu template avançado de projeto você precisa modificar o `frontend\models\SignupForm::signup()`
 conforme abaixo:
 
 ```php
@@ -299,7 +299,7 @@ Para aplicações que requerem controle de acesso complexo com dados de autoriza
 
 ### Usando Regras <span id="using-rules"></span>
 
-Como já mencionado, regras coloca restrição adicional às roles e permissões. Uma regra é uma classe que se estende de [[yii\rbac\Rule]]. Ela deve implementar o método [[yii\rbac\Rule::execute()|execute()]]. Na hierarquia que criamos anteriormente, author não pode editar seu próprio post. Vamos corrigir isto. Primeiro nós precisamos de uma regra para verificar se o usuário é o autor do post:
+Como já mencionado, regras coloca restrição adicional às funções e permissões. Uma regra é uma classe que se estende de [[yii\rbac\Rule]]. Ela deve implementar o método [[yii\rbac\Rule::execute()|execute()]]. Na hierarquia que criamos anteriormente, author não pode editar seu próprio post. Vamos corrigir isto. Primeiro nós precisamos de uma regra para verificar se o usuário é o autor do post:
 
 ```php
 namespace app\rbac;
@@ -387,17 +387,17 @@ No caso de Jane é um pouco mais simples, uma vez que ela é um administrador:
 ![Access check](images/rbac-access-check-3.png "Access check")
 
 
-### Usando Roles Padrões <span id="using-default-roles"></span>
+### Usando Funções Padrões <span id="using-default-roles"></span>
 
-Uma role padrão é uma role que é *implicitamente* atribuída a *todos* os usuários. A chamada a [[yii\rbac\ManagerInterface::assign()]] não é necessária, e os dados de autorização não contém informação de atribuição.
+Uma função padrão é uma função que é *implicitamente* atribuída a *todos* os usuários. A chamada a [[yii\rbac\ManagerInterface::assign()]] não é necessária, e os dados de autorização não contém informação de atribuição.
 
-Uma role padrão é geralmente associada com uma regra que determina se a role aplica-se ao do usuário que está sendo verificado.
+Uma função padrão é geralmente associada com uma regra que determina se a função aplica-se ao do usuário que está sendo verificado.
 
-Roles padrões são muitas vezes utilizados em aplicações que já têm algum tipo de atribuição de role. Por exemplo, uma aplicação pode ter uma coluna de "grupo" em sua tabela de usuário para representar a que grupo de privilégio cada usuário pertence.
-Se cada grupo privilégio pode ser mapeado para uma RBAC role, você pode usar o recurso de role padrão para associar automaticamente cada usuário ao role de RBAC. Vamos usar um exemplo para mostrar como isso pode ser feito.
+Funções padrões são muitas vezes utilizados em aplicações que já têm algum tipo de atribuição de função. Por exemplo, uma aplicação pode ter uma coluna de "grupo" em sua tabela de usuário para representar a que grupo de privilégio cada usuário pertence.
+Se cada grupo privilégio pode ser mapeado para uma função RBAC, você pode usar o recurso de função padrão para associar automaticamente cada usuário a função de RBAC. Vamos usar um exemplo para mostrar como isso pode ser feito.
 
 Suponha que na tabela user, você tem uma coluna `group` que usa 1 para representar o grupo administrator e 2 o grupo author.
-Você pretende ter duas roles RBAC `admin` and `author` para representar as permissões para estes dois grupos, respectivamente. Você pode configurar os dados da RBAC da seguinte forma,
+Você pretende ter duas funções RBAC `admin` and `author` para representar as permissões para estes dois grupos, respectivamente. Você pode configurar os dados da RBAC da seguinte forma,
 
 
 ```php
@@ -444,9 +444,9 @@ $auth->addChild($admin, $author);
 // ... adiciona permissões como filhas de  $admin ...
 ```
 
-Note que no exemplo acima, porque "author" é adicionado como filho de  "admin", quando você implementar o método `execute()` da classe rule, você também precisa respeitar essa hierarquia. É por isso que quando o nome da role é "author", o método `execute()` retornará  true se o grupo de usuário for 1 or 2 (significa que o usuário está no grupo "admin" ou "author").
+Note que no exemplo acima, porque "author" é adicionado como filho de  "admin", quando você implementar o método `execute()` da classe rule, você também precisa respeitar essa hierarquia. É por isso que quando o nome da função é "author", o método `execute()` retornará  true se o grupo de usuário for 1 or 2 (significa que o usuário está no grupo "admin" ou "author").
 
-Em seguida, configure `authManager` listando as duas roles [[yii\rbac\BaseManager::$defaultRoles]]:
+Em seguida, configure `authManager` listando as duas funções [[yii\rbac\BaseManager::$defaultRoles]]:
 
 ```php
 return [
@@ -461,7 +461,7 @@ return [
 ];
 ```
 
-Agora, se você executar uma verificação de acesso, ambas as roles `admin` e `author` serão verificadas através da avaliação das regras associado com elas. se a regra retornar true, isso significa que a role se aplica ao usuário atual. A partir da implementação da regra acima, isto significa que se o valor do ‘grupo’ de um usuário for 1, a role `admin` seria aplicável ao usuário; e se o valor do `grupo` for 2, seria a role `author`.
+Agora, se você executar uma verificação de acesso, ambas as funções `admin` e `author` serão verificadas através da avaliação das regras associado com elas. se a regra retornar true, isso significa que a função se aplica ao usuário atual. A partir da implementação da regra acima, isto significa que se o valor do ‘grupo’ de um usuário for 1, a função `admin` seria aplicável ao usuário; e se o valor do `grupo` for 2, seria a função `author`.
 
 
 
